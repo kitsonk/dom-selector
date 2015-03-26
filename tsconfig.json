@@ -1,0 +1,23 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "module": "amd",
+        "sourceMap": true,
+        "target": "es5",
+        "noImplicitAny": true,
+        "removeComments": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./tests/chai-assert.d.ts",
+        "./tests/chai.d.ts",
+        "./tests/dojo.d.ts",
+        "./tests/functional/all.ts",
+        "./tests/intern.d.ts",
+        "./tests/intern.ts",
+        "./tests/unit/all.ts"
+    ]
+}
