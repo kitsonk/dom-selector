@@ -26,7 +26,6 @@ var internConfig = {
 		{ browserName: 'internet explorer', version: [ '9', '10' ], platform: 'Windows 7' },
 		{ browserName: 'firefox', version: '28', platform: [ 'OS X 10.9', 'Windows 7', 'Windows XP', 'Linux' ] },
 		{ browserName: 'chrome', version: '', platform: [ 'Linux', 'OS X 10.9', 'Windows XP', 'Windows 7', 'Windows 8', 'Windows 8.1' ] },
-		{ browserName: 'safari', version: '6', platform: 'OS X 10.8' },
 		{ browserName: 'safari', version: '7', platform: 'OS X 10.9' }
 	],
 

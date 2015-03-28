@@ -82,5 +82,5 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('default', [ 'ts:default' ]);
 
-	grunt.registerTask('ci', [ 'ts:tests', 'test:client' ]);
+	grunt.registerTask('ci', [ 'ts:tests', 'test:client', 'test:runner' ]);
 };
