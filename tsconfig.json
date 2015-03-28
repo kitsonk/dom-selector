@@ -12,12 +12,17 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./create.ts",
+        "./modify.ts",
+        "./select.ts",
         "./tests/chai-assert.d.ts",
         "./tests/chai.d.ts",
         "./tests/dojo.d.ts",
         "./tests/functional/all.ts",
         "./tests/intern.d.ts",
         "./tests/intern.ts",
-        "./tests/unit/all.ts"
+        "./tests/unit/all.ts",
+        "./tests/unit/useRoot.ts",
+        "./useRoot.ts"
     ]
 }
