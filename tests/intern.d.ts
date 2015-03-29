@@ -1,6 +1,7 @@
 /// <reference path="chai.d.ts" />
 /// <reference path="chai-assert.d.ts" />
 /// <reference path="dojo.d.ts" />
+/// <reference path="jsdom.d.ts" />
 
 interface IInternDeferred<T> extends IDeferred<T> {
 	callback<U>(callback:U):U;
@@ -51,4 +52,11 @@ declare module 'intern/chai!expect' {
 declare module 'intern/chai!should' {
 	var should:Function;
 	export = should;
+}
+
+declare module 'intern/node_modules/dojo/node!../../node_modules/jsdom/lib/jsdom' {
+	var jd: {
+		jsdom(markup: string, config?: jsdom.Config):Document;
+	}
+	export = jd;
 }
