@@ -54,9 +54,16 @@ declare module 'intern/chai!should' {
 	export = should;
 }
 
-declare module 'intern/node_modules/dojo/node!../../node_modules/jsdom/lib/jsdom' {
+declare module 'dojo/has!host-node?../loadjsdom' {
 	var jd: {
 		jsdom(markup: string, config?: jsdom.Config):Document;
+	}
+	export = jd;
+}
+
+declare module 'dojo/node!../../node_modules/jsdom/lib/jsdom' {
+	var jd: {
+		jsdom(markup:string, config?: jsdom.Config):Document;
 	}
 	export = jd;
 }
