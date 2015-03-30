@@ -133,7 +133,7 @@ registerSuite({
 		assert.equal(1, select('section').length, 'select("section")');
 		assert.equal(0, select(null).length, 'select(null)');
     },
-	'syntatic equivilents': function () {
+	'syntatic equivalents': function () {
 		assert.equal(12, select('#t > *').length, 'select("#t > *")');
 		assert.equal(3, select('.foo > *').length, 'select(".foo > *")');
 	},
