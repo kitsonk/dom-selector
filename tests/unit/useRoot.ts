@@ -1,15 +1,24 @@
 import assert = require('intern/chai!assert');
 import useRoot = require('../../useRoot');
+import dom = require('../../dom');
 import registerSuite = require('intern!object');
+import jsdom = require('dojo/has!host-node?../loadjsdom');
 
 var hasDOM:boolean = typeof document !== 'undefined';
+var doc:Document;
 
 registerSuite({
     name: 'useRoot',
-    'basic': function () {
+    setup: function () {
         if (!hasDOM) {
-            this.skip('No DOM present');
+            dom.setDoc(jsdom.jsdom('<html><body></body></html>'));
         }
+        doc = dom.getDoc();
+    },
+    teardown: function () {
+        dom.resetDoc();
+    },
+    'basic': function () {
         var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
             p = <HTMLElement>div.appendChild(document.createElement('p')),
             qsa = div.querySelectorAll;
@@ -19,9 +28,6 @@ registerSuite({
         assert.equal(useRoot(p, 'div span', qsa).length, 0);
     },
     'with id': function () {
-        if (!hasDOM) {
-            this.skip('No DOM present');
-        }
         var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
             p = <HTMLElement>div.appendChild(document.createElement('p')),
             qsa = div.querySelectorAll;
@@ -35,9 +41,6 @@ registerSuite({
         }).length, 0);
     },
     'without id': function () {
-        if (!hasDOM) {
-            this.skip('No DOM present');
-        }
         var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
             p = <HTMLElement>div.appendChild(document.createElement('p')),
             qsa = div.querySelectorAll;
