@@ -6,10 +6,6 @@ import jsdom = require('dojo/has!host-node?../loadjsdom');
 
 var hasDOM:boolean = typeof document !== 'undefined';
 
-if (!hasDOM) {
-	dom.setDoc(jsdom.jsdom('<html><body></body></html>'));
-}
-
 var doc:Document;
 
 function get(id:string):HTMLElement {
@@ -106,10 +102,18 @@ function setQueryTestDom(root?:HTMLElement) {
 
 registerSuite({
     name: 'select',
-    'basic': function () {
+	setup: function () {
+		if (!hasDOM) {
+			dom.setDoc(jsdom.jsdom('<html><body></body></html>'));
+		}
 		doc = dom.getDoc();
 		emptyDom();
 		setQueryTestDom();
+	},
+	teardown: function () {
+		dom.resetDoc();
+	},
+    'basic': function () {
 		assert.equal(4, select('h3').length, 'select("h3")');
 		assert.equal(1, select('#t').length, 'select("#t")');
 		assert.equal(1, select('#bug').length, 'select("#bug")');
