@@ -19,20 +19,23 @@ registerSuite({
         dom.resetDoc();
     },
     'basic': function () {
-        var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
-            p = <HTMLElement>div.appendChild(document.createElement('p')),
+        if (!hasDOM) {
+            this.skip('Apparently jsdom doesn\'t behave in a broken way!');
+        }
+        var div = <HTMLElement>doc.body.appendChild(doc.createElement('div')),
+            p = <HTMLElement>div.appendChild(doc.createElement('p')),
             qsa = div.querySelectorAll;
-        p.appendChild(document.createElement('span'));
+        p.appendChild(doc.createElement('span'));
 
         assert.equal(qsa.call(p, 'div span').length, 1);
         assert.equal(useRoot(p, 'div span', qsa).length, 0);
     },
     'with id': function () {
-        var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
-            p = <HTMLElement>div.appendChild(document.createElement('p')),
+        var div = <HTMLElement>doc.body.appendChild(doc.createElement('div')),
+            p = <HTMLElement>div.appendChild(doc.createElement('p')),
             qsa = div.querySelectorAll;
 
-        p.appendChild(document.createElement('span'));
+        p.appendChild(doc.createElement('span'));
         p.setAttribute('id', 'test_p');
 
         assert.equal(useRoot(p, 'div span', function (query:string) {
@@ -41,11 +44,11 @@ registerSuite({
         }).length, 0);
     },
     'without id': function () {
-        var div = <HTMLElement>document.body.appendChild(document.createElement('div')),
-            p = <HTMLElement>div.appendChild(document.createElement('p')),
+        var div = <HTMLElement>doc.body.appendChild(doc.createElement('div')),
+            p = <HTMLElement>div.appendChild(doc.createElement('p')),
             qsa = div.querySelectorAll;
 
-        p.appendChild(document.createElement('span'));
+        p.appendChild(doc.createElement('span'));
 
         assert.strictEqual(p.id, '');
 
