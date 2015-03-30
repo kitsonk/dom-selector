@@ -1,10 +1,10 @@
 import assert = require('intern/chai!assert');
-import useRoot = require('../../useRoot');
 import dom = require('../../dom');
 import registerSuite = require('intern!object');
 import jsdom = require('dojo/has!host-node?../loadjsdom');
 
 var hasDOM:boolean = typeof document !== 'undefined';
+var useRoot = dom.useRoot;
 var doc:Document;
 
 registerSuite({

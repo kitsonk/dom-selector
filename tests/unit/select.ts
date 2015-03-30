@@ -1,10 +1,10 @@
 import assert = require('intern/chai!assert');
-import select = require('../../select');
 import dom = require('../../dom');
 import registerSuite = require('intern!object');
 import jsdom = require('dojo/has!host-node?../loadjsdom');
 
-var hasDOM:boolean = typeof document !== 'undefined';
+var hasDOM:boolean = typeof document !== 'undefined',
+	select = dom.select;
 
 var doc:Document;
 

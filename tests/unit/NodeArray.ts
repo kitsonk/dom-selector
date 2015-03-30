@@ -1,10 +1,10 @@
 import assert = require('intern/chai!assert');
-import NodeArray = require('../../NodeArray');
 import dom = require('../../dom');
 import registerSuite = require('intern!object');
 import jsdom = require('dojo/has!host-node?../loadjsdom');
 
 var hasDOM:boolean = typeof document !== 'undefined';
+var NodeArray = dom.NodeArray;
 var doc:Document;
 
 registerSuite({
