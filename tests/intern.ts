@@ -46,7 +46,10 @@ var internConfig = {
 	// can be used here
 	loader: {
 		// Packages that should be registered with the loader in each testing environment
-		packages: [ { name: 'dom-selector', location: '.' } ]
+		packages: [
+			{ name: 'dom-selector', location: '.' },
+			{ name: 'dojo', location: './node_modules/dojo' }
+		]
 	},
 
 	// Non-functional test suite(s) to run in each browser
