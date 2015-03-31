@@ -186,13 +186,21 @@ export class NodeArray extends ExtensionArray<DomTypes> implements domSelector.I
 
     select(...selectors:string[]):NodeArray {
         var results:any[] = [];
-        this.forEach(function (value: DomTypes, index: number, array: (DomTypes)[]) {
+        this.forEach(function (value: DomTypes) {
             var args:any[] = [ value ];
             args = args.concat(selectors);
-            results = results.concat(select.apply(this, args));
-        }, this)
+            select.apply(this, args).forEach(function (value:any) {
+                results.push(value);
+            });
+        });
         return NodeArray.from(results);
     }
+}
+
+/* get */
+
+export function get(id:string):HTMLElement {
+    return getDoc().getElementById(id);
 }
 
 /* select */
@@ -209,10 +217,6 @@ export function select(...selectors:any[]):NodeArray {
         fastPath:RegExpExecArray,
         fastPathResults:HTMLElement[],
         results:HTMLElement[] = [];
-
-    function get(id:string):HTMLElement {
-        return doc.getElementById(id);
-    }
 
     function fastPathQuery(root:HTMLElement|Document, selectorMatch:string[]):HTMLElement[] {
         var parent:Node,

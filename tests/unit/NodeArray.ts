@@ -14,6 +14,10 @@ registerSuite({
             dom.setDoc(jsdom.jsdom('<html><body></body></html>'));
         }
         doc = dom.getDoc();
+        while (doc.body.firstChild) {
+    		doc.body.removeChild(doc.body.firstChild);
+    	}
+        doc.body.innerHTML = '<div><p><span></span></p><span></span></div><div><p><span></span></p></div><div></div>';
     },
     teardown: function () {
         dom.resetDoc();
@@ -25,7 +29,7 @@ registerSuite({
         nodeArray.push(doc.createElement('p'));
         assert.equal(nodeArray.length, 2);
     },
-    '.from()': function () {
+    'from()': function () {
         var div = doc.createElement('div'),
             p = doc.createElement('p'),
             span = doc.createElement('span');
@@ -35,5 +39,14 @@ registerSuite({
         assert.equal(nodeArray[0], div);
         assert.equal(nodeArray[1], p);
         assert.equal(nodeArray[2], span);
+    },
+    'select()': function () {
+        var na = dom.select('div');
+        assert.equal(na.length, 3);
+        assert.equal(na.select('p').length, 2);
+        assert.equal(na.select('span').length, 3);
+        assert.equal(na.select('p').select('span').length, 2);
+        assert.equal(na.select('p>span').length, 2);
+        assert.equal(na.select().length, 0);
     }
 })
