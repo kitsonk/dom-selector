@@ -1,28 +1,20 @@
 {
     "version": "1.4.1",
     "compilerOptions": {
+        "declaration": false,
         "module": "amd",
-        "sourceMap": true,
-        "target": "es5",
         "noImplicitAny": true,
-        "removeComments": false
+        "removeComments": false,
+        "sourceMap": true,
+        "target": "es5"
     },
     "filesGlob": [
-        "./**/*.ts",
-        "!./node_modules/**/*.ts"
+        "./src/**/*.ts",
+        "./typings/tsd.d.ts"
     ],
     "files": [
-        "./create.ts",
-        "./modify.ts",
-        "./select.ts",
-        "./tests/chai-assert.d.ts",
-        "./tests/chai.d.ts",
-        "./tests/dojo.d.ts",
-        "./tests/functional/all.ts",
-        "./tests/intern.d.ts",
-        "./tests/intern.ts",
-        "./tests/unit/all.ts",
-        "./tests/unit/useRoot.ts",
-        "./useRoot.ts"
+        "./src/dom.ts",
+        "./src/interfaces.d.ts",
+        "./typings/tsd.d.ts"
     ]
 }

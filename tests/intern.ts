@@ -47,16 +47,17 @@ var internConfig = {
 	loader: {
 		// Packages that should be registered with the loader in each testing environment
 		packages: [
-			{ name: 'dom-selector', location: '.' },
-			{ name: 'dojo', location: './node_modules/intern/node_modules/dojo' }
+			{ name: 'dom-selector', location: 'src' },
+			{ name: 'tests', location: 'tests' },
+			{ name: 'dojo', location: 'node_modules/intern/node_modules/dojo' }
 		]
 	},
 
 	// Non-functional test suite(s) to run in each browser
-	suites: [ 'dom-selector/tests/unit/all' ],
+	suites: [ 'tests/unit/all' ],
 
 	// Functional test suite(s) to run in each browser once non-functional tests are completed
-	functionalSuites: [ 'dom-selector/tests/functional/all' ],
+	functionalSuites: [ 'tests/functional/all' ],
 
 	// A regular expression matching URLs to files that should not be included in code coverage analysis
 	excludeInstrumentation: /^(?:node_modules|tests)\//

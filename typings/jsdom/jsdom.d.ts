@@ -3,7 +3,7 @@
 // Definitions by: Asana <https://asana.com>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-declare module jsdom {
+declare module "jsdom" {
 	/**
 	 * The do-what-I-mean API.
 	 *

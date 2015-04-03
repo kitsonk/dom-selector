@@ -1,33 +1,54 @@
 import domSelector = require('./interfaces');
 
 type DomTypes = Node|HTMLElement;
+type ISelectorObject = domSelector.ISelectorObject;
 
 /* Document */
-var _doc:Document = typeof document !== 'undefined' ? document : undefined;
+var _doc: Document = typeof document !== 'undefined' ? document : undefined;
 
-export function getDoc():Document {
+export function getDoc(): Document {
     return _doc;
 }
 
-export function setDoc(value:Document):void {
+export function setDoc(value: Document): void {
     _doc = value;
 }
 
-export function resetDoc():void {
+export function resetDoc(): void {
     _doc = typeof document !== 'undefined' ? document : undefined;
+}
+
+/* Other Module Interfaces */
+
+export var defaultTag: string = 'div';
+
+var selectorRE: RegExp = /\s*([-+~,<>])?\s*([-\w%$|]+)?((?:[.#][-\w%$|]+)+)?(?:\[((?:[^\]=]+)=?['"]?(?:[^\]'"]*))['"]?\])?(?::{1,2}([-\w]+)(?:\(([^\)]+)\))?)?/g;
+/* Group 1: Combinator
+ * Group 2: Type
+ * Group 3: Classes/ID
+ * Group 4: Attributes
+ * Group 5: PsuedoClass/Element
+ * Group 6: PsuedoClass Arguments */
+
+function selectorToObject(selector: string): ISelectorObject {
+    return {};
+}
+
+function selectorObjectToString(selectorObject: ISelectorObject): string {
+    return '';
 }
 
 /* Use Root */
 
-var unionSplit:RegExp = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
+var unionSplit: RegExp = /([^\s,](?:"(?:\\.|[^"])+"|'(?:\\.|[^'])+'|[^,])*)/g,
     uid:string = '__ur' + Math.floor(Math.random() * 100000000) + '__';
 
-export function useRoot(context:HTMLElement, query:string, method:Function):NodeList {
-    var oldContext:HTMLElement = context,
-        oldId:string = context.getAttribute('id'),
-        newId:string = oldId || uid,
-        hasParent:boolean = Boolean(context.parentNode),
-        relativeHierarchySelector:boolean = /^\s*[+~]/.test(query);
+export function useRoot(context: HTMLElement, query: string, method: Function): NodeList {
+    var oldContext: HTMLElement = context,
+        oldId: string = context.getAttribute('id'),
+        newId: string = oldId || uid,
+        hasParent: boolean = Boolean(context.parentNode),
+        relativeHierarchySelector: boolean = /^\s*[+~]/.test(query);
 
     if (relativeHierarchySelector && !hasParent) {
         return new NodeList();
@@ -184,7 +205,7 @@ export class NodeArray extends ExtensionArray<DomTypes> implements domSelector.I
         }
     }
 
-    select(...selectors:string[]):NodeArray {
+    select(...selectors:(string|ISelectorObject)[]):NodeArray {
         var results:any[] = [];
         this.forEach(function (value: DomTypes) {
             var args:any[] = [ value ];
@@ -194,6 +215,21 @@ export class NodeArray extends ExtensionArray<DomTypes> implements domSelector.I
             });
         });
         return NodeArray.from(results);
+    }
+
+    put(target:DomTypes|string|ISelectorObject):NodeArray {
+        /* STUB */
+        return NodeArray.from([]);
+    }
+
+    create(...selectors:(string|ISelectorObject)[]):NodeArray {
+        /* STUB */
+        return NodeArray.from([]);
+    }
+
+    modify(...selectors:(string|ISelectorObject)[]):NodeArray {
+        /* STUB */
+        return NodeArray.from([]);
     }
 }
 
@@ -208,8 +244,8 @@ export function get(id:string):HTMLElement {
 var slice = Array.prototype.slice,
     fastPathRE:RegExp = /^([\w]*)#([\w\-]+$)|^(\.)([\w\-\*]+$)|^(\w+$)/;
 
-export function select(root:DomTypes|Document, ...selectors:string[]):NodeArray;
-export function select(...selectors:string[]):NodeArray;
+export function select(target:DomTypes|Document, ...selectors:(string|ISelectorObject)[]):NodeArray;
+export function select(...selectors:(string|ISelectorObject)[]):NodeArray;
 export function select(...selectors:any[]):NodeArray {
     var doc:Document = getDoc(),
         node:HTMLElement = <HTMLElement><Node>doc,
@@ -218,7 +254,7 @@ export function select(...selectors:any[]):NodeArray {
         fastPathResults:HTMLElement[],
         results:HTMLElement[] = [];
 
-    function fastPathQuery(root:HTMLElement|Document, selectorMatch:string[]):HTMLElement[] {
+    function fastPathQuery(target:HTMLElement|Document, selectorMatch:string[]):HTMLElement[] {
         var parent:Node,
             found:HTMLElement;
 
@@ -229,7 +265,7 @@ export function select(...selectors:any[]):NodeArray {
                 /* Either the ID wasn't found or was a tag qualified that didn't match */
                 return [];
             }
-            if (root !== doc) {
+            if (target !== doc) {
                 /* There is a root element, let's make sure it is in the ancestry tree */
                 parent = found;
                 while (parent !== node) {
@@ -243,13 +279,13 @@ export function select(...selectors:any[]):NodeArray {
             /* If there is part of the query we haven't resolved, then we need to send it back to select */
             return selectorMatch[3] ? slice.call(select(found, selectorMatch[3])) : [ found ];
         }
-        if (selectorMatch[3] && 'getElementsByClassName' in root) {
+        if (selectorMatch[3] && 'getElementsByClassName' in target) {
             /* a .class selector */
-            return slice.call(root.getElementsByClassName(selectorMatch[4]));
+            return slice.call(target.getElementsByClassName(selectorMatch[4]));
         }
         if (selectorMatch[5]) {
             /* a tag selector */
-            return slice.call(root.getElementsByTagName(selectorMatch[5]));
+            return slice.call(target.getElementsByTagName(selectorMatch[5]));
         }
         return [];
     }
@@ -289,6 +325,85 @@ export function select(...selectors:any[]):NodeArray {
         }
         else if(selector) {
             throw new TypeError('Invalid argument type of: "' + typeof selector + '"');
+        }
+    }
+    return NodeArray.from(results);
+}
+
+/* put */
+
+var fragmentFasterHeuristicRE:RegExp = /[-+,> ]/,
+	namespaces:boolean = false,
+	namespaceIndex:number;
+
+function insertTextNode(doc:Document, node:HTMLElement, text:string) {
+	node.appendChild(doc.createTextNode(text));
+}
+
+export function put(target:DomTypes|Document|string, ...selectors:(DomTypes|string)[]):NodeArray {
+    var selector:DomTypes|string,
+        doc:Document = getDoc(),
+        currentNode:DomTypes,
+        referenceNode:DomTypes,
+        nextSibling:DomTypes,
+        fragment:DocumentFragment;
+
+    function insertLastNode():void {
+        if (currentNode && referenceNode && currentNode !== referenceNode) {
+            (referenceNode === target &&
+                (fragment ||
+                    (fragment = fragmentFasterHeuristicRE.test(<string>selector) && doc.createDocumentFragment()))
+                    || referenceNode).insertBefore(currentNode, nextSibling || null);
+        }
+    }
+
+    function parseSelector(match: string, combinator:string, typeSelector:string, marker:string, classText:string, attributeText: string, psuedoClass: string, psuedoClassArgs: string):string {
+        // test
+        return '';
+    }
+
+    for (var i = 0; i < selectors.length; i++) {
+        selector = selectors[i];
+        if (typeof selector === 'object' && 'nodeType' in selector) {
+            //
+        }
+        if (typeof selector === 'string') {
+            //
+        }
+        else {
+            throw new TypeError('Invalid selector arguments.  Must be of type string or DOM Node.');
+        }
+    }
+
+    return NodeArray.from([]);
+}
+
+/* Create */
+
+export function create(...selectors:string[]):NodeArray {
+    return NodeArray.from([]);
+}
+
+/* Modify */
+
+export function modify(target:DomTypes|string, ...selectors:string[]):NodeArray {
+    return NodeArray.from([]);
+}
+
+/* remove */
+
+export function remove(nodes:NodeArray):NodeArray;
+export function remove(...nodes:(DomTypes|string)[]):NodeArray;
+export function remove(...nodes:any[]):NodeArray {
+    var results:any[] = [],
+        node:DomTypes|string;
+    if (nodes.length === 1 && nodes[0] instanceof NodeArray) {
+        nodes = nodes[0];
+    }
+    for (var i = 0; i < nodes.length; i++) {
+        node = nodes[i];
+        if (typeof node === 'string') {
+            node = get(<string>node);
         }
     }
     return NodeArray.from(results);

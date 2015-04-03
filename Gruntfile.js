@@ -1,30 +1,56 @@
 /* jshint node:true */
 
 module.exports = function (grunt) {
+	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-ts');
+	grunt.loadNpmTasks('grunt-tslint');
 	grunt.loadNpmTasks('intern');
 
 	grunt.initConfig({
 		ts: {
 			options: {
 				failOnTypeErrors: true,
-				fast: process.env.CONTINUOUS_INTEGRATION ? 'never' : 'watch',
-				module: 'commonjs',
+				fast: 'never',
 				noImplicitAny: true,
 				sourceMap: true,
 				target: 'es5'
 			},
-
-			default: {
-				src: [ '**/*.ts', '!**/*.d.ts', '!tests/**/*.ts', '!node_modules/**/*.ts' ],
-				watch: '.'
+			amd: {
+				options: {
+					module: 'amd'
+				},
+				outDir: 'dist',
+				src: [ '<%= all %>' ]
 			},
-
+			amdLoader: {
+				options: {
+					module: 'commonjs'
+				},
+				outDir: 'dist',
+				src: [ 'src/loader.ts' ]
+			},
+			cjs: {
+				options: {
+					module: 'commonjs'
+				},
+				outDir: 'dist',
+				src: [ '<%= all %>' ]
+			},
 			tests: {
 				options: {
 					module: 'amd'
 				},
-				src: [ 'tests/**/*.ts' ]
+				src: [ 'tests/**/*.ts', 'typings/tsd.d.ts' ]
+			}
+		},
+
+		tslint: {
+			options: {
+				configuration: grunt.file.readJSON('tslint.json')
+			},
+			dojo: {
+				src: [ '<%= all %>' ]
 			}
 		},
 
@@ -68,6 +94,7 @@ module.exports = function (grunt) {
 			addReporter('console');
 		}
 
+		grunt.task.run('ts:tests');
 		grunt.task.run('intern:' + target);
 	});
 
@@ -82,5 +109,5 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('default', [ 'ts:default' ]);
 
-	grunt.registerTask('ci', [ 'ts:tests', 'test:client', 'test:runner' ]);
+	grunt.registerTask('ci', [ 'ts:tests', 'intern:client', 'intern:runner' ]);
 };

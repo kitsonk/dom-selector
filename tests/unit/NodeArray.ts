@@ -1,5 +1,5 @@
 import assert = require('intern/chai!assert');
-import dom = require('../../dom');
+import dom = require('../../src/dom');
 import registerSuite = require('intern!object');
 import jsdom = require('dojo/has!host-node?../loadjsdom');
 
