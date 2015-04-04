@@ -22,20 +22,98 @@ export function resetDoc(): void {
 
 export var defaultTag: string = 'div';
 
-var selectorRE: RegExp = /\s*([-+~,<>])?\s*([-\w%$|]+)?((?:[.#][-\w%$|]+)+)?(?:\[((?:[^\]=]+)=?['"]?(?:[^\]'"]*))['"]?\])?(?::{1,2}([-\w]+)(?:\(([^\)]+)\))?)?/g;
-/* Group 1: Combinator
- * Group 2: Type
- * Group 3: Classes/ID
- * Group 4: Attributes
- * Group 5: PsuedoClass/Element
- * Group 6: PsuedoClass Arguments */
+export function selectorToObject(selector: string): ISelectorObject {
+    var selectorRE: RegExp = /\s*([-+~,<>\*])?\s*([-\w%$|]+)?((?:[.#][-\w%$|]+)+)?((?:\[[^\]]+\])+)?((?::{1,2}[-\w]+(?:\([^\)]+\))?)+)?/,
+        classIdRE: RegExp = /([.#])([-\w%$|]+)/g,
+        psuedoClassRE: RegExp = /(?::{1,2}([-\w]+)(?:\(([^\)]+)\))?)?/g,
+        attributeRE: RegExp = /\[([^\]+]*['"]?)\]/g,
+        attributeKeyValueRE: RegExp = /([^\]=]+)=?['"]?([^\]'"]*)['"]?/;
 
-function selectorToObject(selector: string): ISelectorObject {
-    return {};
+    var parsedSelector: RegExpExecArray = selectorRE.exec(selector),
+        selectorObject: ISelectorObject = {},
+        attributes: string[],
+        attributeKeyValue: string[];
+
+    function parseClassId(t: string, marker: string, text: string): string {
+        if (marker === '.') {
+            if (!('classNames' in selectorObject)) {
+                selectorObject.classNames = [];
+            }
+            selectorObject.classNames.push(text);
+        } else if (marker === '#') {
+            selectorObject.id = text;
+        }
+        return '';
+    }
+
+    function parsePsuedoClasses(t: string, className: string, attributes: string): string {
+        if (className) {
+            if (!('psuedoClasses' in selectorObject)) {
+                selectorObject.psuedoClasses = {};
+            }
+            selectorObject.psuedoClasses[className] = attributes || null;
+        }
+        return '';
+    }
+
+    if (parsedSelector[1]) {
+        selectorObject.combinator = parsedSelector[1];
+    }
+    if (parsedSelector[2]) {
+        selectorObject.typeName = parsedSelector[2];
+    }
+    if (parsedSelector[3]) {
+        if (parsedSelector[3].replace(classIdRE, parseClassId)) {
+            throw new Error('Invalid class or ID');
+        }
+    }
+    if (parsedSelector[4]) {
+        attributes = parsedSelector[4].split(attributeRE);
+        selectorObject.attributes = {};
+        for (var i = 0; i < attributes.length; i++) {
+            if (attributes[i].length) {
+                attributeKeyValue = attributes[i].split(attributeKeyValueRE);
+                if (attributeKeyValue[1]) {
+                    selectorObject.attributes[attributeKeyValue[1]] = attributeKeyValue[2];
+                }
+            }
+        }
+    }
+    if (parsedSelector[5]) {
+        if (parsedSelector[5].replace(psuedoClassRE, parsePsuedoClasses)) {
+            throw new Error('Invalid psuedo class');
+        }
+    }
+
+    return selectorObject;
 }
 
-function selectorObjectToString(selectorObject: ISelectorObject): string {
-    return '';
+export function selectorObjectToString(selectorObject: ISelectorObject): string {
+    var selector: string = '';
+    if (selectorObject.combinator) {
+        selector += selectorObject.combinator + ' ';
+    }
+    if (selectorObject.typeName) {
+        selector += selectorObject.typeName;
+    }
+    if (selectorObject.id) {
+        selector += '#' + selectorObject.id;
+    }
+    if (selectorObject.classNames && selectorObject.classNames.length) {
+        selector += '.' + selectorObject.classNames.join('.');
+    }
+    if (selectorObject.attributes) {
+        for (var key in selectorObject.attributes) {
+            selector += selectorObject.attributes[key] ? '[' + key + '="' + selectorObject.attributes[key] + '"]' : '[' + key + ']';
+        }
+    }
+    if (selectorObject.attributes) {
+        for (var key in selectorObject.psuedoClasses) {
+            selector += selectorObject.psuedoClasses[key] !== null ? ':' + key + '(' + selectorObject.psuedoClasses[key] + ')' : ':' + key;
+        }
+    }
+
+    return selector;
 }
 
 /* Use Root */

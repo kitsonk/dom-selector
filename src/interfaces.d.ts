@@ -10,6 +10,5 @@ export interface ISelectorObject {
     id?: string;
     classNames?: string[];
     attributes?: { [key: string]: string; };
-    psuedoSelector?: string;
-    psuedoSelectorArguments?: string;
+    psuedoClasses?: { [className: string]: string; };
 }
